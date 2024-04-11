@@ -1,0 +1,75 @@
+# Detekt configuration file
+# This file is used to configure the Detekt static analysis tool across the project. Rules should
+# not be changed unless necessary and not without permission from the project maintainers. If a
+# rule is changed, comments should be added to explain the reasoning behind the change.
+
+naming:
+  # @Composable functions that return Unit are named using PascalCase.
+  FunctionNaming:
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+
+style:
+  # Class/companion object/top-level properties that declare objects such as Color(0xFFEA6D7E) may
+  # be considered violations if they don't specify the named parameter
+  MagicNumber:
+    ignorePropertyDeclaration: true
+  # This conflicts with the compose rule PreviewPublic. It is disabled to members of the Preview
+  # annotation.
+  UnusedPrivateMember:
+    ignoreAnnotated:
+      - "Preview"
+
+# Rules provided by the detekt-compose plugin: https://mrmans0n.github.io/compose-rules/
+Compose:
+  ComposableAnnotationNaming:
+    active: true
+  ComposableNaming:
+    active: true
+  ComposableParamOrder:
+    active: true
+  CompositionLocalAllowlist:
+    active: true
+  CompositionLocalNaming:
+    active: true
+  ContentEmitterReturningValues:
+    active: true
+  DefaultsVisibility:
+    active: true
+  LambdaParameterInRestartableEffect:
+    active: true
+  ModifierClickableOrder:
+    active: true
+  ModifierComposable:
+    active: true
+  ModifierComposed:
+    active: true
+  ModifierMissing:
+    active: true
+  ModifierNaming:
+    active: true
+  ModifierNotUsedAtRoot:
+    active: true
+  ModifierReused:
+    active: true
+  ModifierWithoutDefault:
+    active: true
+  MultipleEmitters:
+    active: true
+  MutableParams:
+    active: true
+  MutableStateParam:
+    active: true
+  PreviewAnnotationNaming:
+    active: true
+  PreviewPublic:
+    active: true
+  RememberMissing:
+    active: true
+  RememberContentMissing:
+    active: true
+  UnstableCollections:
+    active: true
+  ViewModelForwarding:
+    active: true
+  ViewModelInjection:
+    active: true

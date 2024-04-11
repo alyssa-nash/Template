@@ -1,0 +1,53 @@
+[versions]
+androidGradlePlugin = "8.3.1"
+androidxActivity = "1.8.2"
+androidxComposeBom = "2024.04.00"
+androidxComposeCompiler = "1.5.10"
+androidxCore = "1.12.0"
+kotlin = "1.9.22"
+junit5 = "1.10.0.0"
+junit5Compose = "1.4.0"
+jupiter = "5.10.0"
+junitVersion = "1.1.5"
+konsist = "0.15.1"
+detekt = "1.23.3"
+detektCompose = "0.3.13"
+spotless = "6.25.0"
+
+[libraries]
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+detekt-compose = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "detektCompose" }
+
+# Testing dependencies
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
+jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "jupiter" }
+jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiter" }
+junit5-compose = { group = "de.mannodermaus.junit5", name = "android-test-compose", version.ref = "junit5Compose" }
+
+# Dependencies of the included build-logic
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+junit5-wrapper = { id = "de.mannodermaus.android-junit5", version.ref = "junit5" }
+
+# Plugins defined by this project
+template-android-application = { id = "template.android.application", version = "unspecified" }
+template-android-library = { id = "template.android.library", version = "unspecified" }
+template-android-feature = { id = "template.android.feature", version = "unspecified" }
+template-android-application-compose = { id = "template.android.application.compose", version = "unspecified" }
+template-android-library-compose = { id = "template.android.library.compose", version = "unspecified" }
+template-detekt = { id = "template.detekt", version = "unspecified" }
+template-spotless = { id = "template.spotless", version = "unspecified" }

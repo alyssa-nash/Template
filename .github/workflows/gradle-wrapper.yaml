@@ -1,0 +1,18 @@
+# When a pull request changes the Gradle wrapper, this workflow validates the Gradle wrapper checksum.
+name: gradle-wrapper
+
+on:
+  pull_request:
+    paths:
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'gradle/wrapper/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    # Validates the checksum of the gradle wrapper JAR: https://github.com/gradle/wrapper-validation-action
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/wrapper-validation-action@v2

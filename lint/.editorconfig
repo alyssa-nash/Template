@@ -1,0 +1,10 @@
+# Ktlint configuration file
+# This file is used to configure the Ktlint formatting linter across the project. Rules should
+# not be changed unless necessary and not without permission from the project maintainers. If a
+# rule is changed, comments should be added to explain the reasoning behind the change.
+
+root = true
+
+[*.{kt,kts}]
+# Ignore function naming rules for Composable functions
+ktlint_function_naming_ignore_when_annotated_with=Composable

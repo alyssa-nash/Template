@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Run spotlessCheck before commit
+./gradlew spotlessCheck
+
+# Check if spotlessCheck passed
+if [ $? -ne 0 ]; then
+  echo "Commit rejected: spotlessCheck failed. Applying auto-correct..."
+  ./gradlew spotlessApply
+  echo "Auto-correct applied. Check the changes and commit again."
+  exit 1
+fi
+
+# Run detekt before commit
+./gradlew detekt
+
+# Check if detekt passed
+if [ $? -ne 0 ]; then
+  echo "Commit rejected: detekt failed."
+  exit 1
+fi

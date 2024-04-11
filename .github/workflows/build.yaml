@@ -1,0 +1,162 @@
+# This file is used to build the project and run tests on GitHub Actions.
+name: Build
+
+# This workflow is triggered on pushes to the main branch and pull requests.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# Ensure that only one instance of the workflow is running at a time, otherwise it is canceled.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Gradle options to be ran only for this workflow.
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+
+jobs:
+  # This job runs Android lint and uploads the results. Lint is set to run on all dependencies.
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository: https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Set up JDK 17: https://github.com/actions/setup-java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      # Install Gradle: https://github.com/gradle/actions
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Install Android SDK (if self-hosted runner): https://github.com/android-actions/setup-android
+      - name: Setup Android
+        if: env.IS_LOCAL_RUNNER == 'true'
+        uses: android-actions/setup-android@v3
+        with:
+          log-accepted-android-sdk-licenses: false
+
+      # Runs the spotless plugin, which runs the ktlint formatter:
+      # https://github.com/diffplug/spotless/tree/main/plugin-gradle
+      # https://github.com/pinterest/ktlint
+      - name: Run Spotless
+        run: ./gradlew spotlessCheck
+
+      # Runs the Detekt static analysis tool: https://github.com/detekt/detekt
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      # Run lint checks
+      - name: Run lint checks
+        run: ./gradlew lintDebug
+
+      # Upload lint reports for visualization and tracking: https://github.com/actions/upload-artifact
+      - name: Upload lint reports
+        if: env.IS_LOCAL_RUNNER != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: '**/build/reports/lint-results*.html'
+
+      - name: Run Konsist checks
+        run: ./gradlew konsistTest:test --rerun-tasks
+
+  # This job runs the unit tests and uploads the results.
+  unit_tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository: https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Set up JDK 17: https://github.com/actions/setup-java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      # Install Gradle: https://github.com/gradle/actions
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Install Android SDK (if self-hosted runner): https://github.com/android-actions/setup-android
+      - name: Setup Android
+        if: env.IS_LOCAL_RUNNER == 'true'
+        uses: android-actions/setup-android@v3
+        with:
+          log-accepted-android-sdk-licenses: false
+
+      # Run local tests
+      - name: Run local tests and create report
+        run: ./gradlew testDebugUnitTest -x konsistTest:test
+
+      # Upload unit test results for visualization and tracking: https://github.com/actions/upload-artifact
+      - name: Upload unit test results
+        if: env.IS_LOCAL_RUNNER != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: '**/build/test-results/test*UnitTest/**.xml'
+
+  ui_tests:
+    name: "UI Tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository: https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Set up JDK 17: https://github.com/actions/setup-java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      # Install Gradle: https://github.com/gradle/actions
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Install Android SDK (if self-hosted runner): https://github.com/android-actions/setup-android
+      - name: Setup Android
+        if: env.IS_LOCAL_RUNNER == 'true'
+        uses: android-actions/setup-android@v3
+        with:
+          log-accepted-android-sdk-licenses: false
+
+      - name: Run UI Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          disable-animations: true
+          disk-size: 6000M
+          heap-size: 600M
+          script: ./gradlew connectedDebugAndroidTest --daemon
+
+      - name: Upload test reports
+        if: env.IS_LOCAL_RUNNER != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.api-level }}
+          path: '**/build/reports/androidTests'
